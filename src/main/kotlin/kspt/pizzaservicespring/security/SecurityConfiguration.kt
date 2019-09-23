@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import java.lang.IllegalStateException
 
 
 @EnableWebSecurity
@@ -34,8 +35,11 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     }
 
     override fun authenticationManager() = AuthenticationManager { authentication ->
+        val principal = authentication.principal
+        if (principal is User) return@AuthenticationManager principal
+        if (principal !is String) throw IllegalStateException("Unexpected principal: $principal")
         val login = authentication.principal as String
-        val password = authentication.principal as String
+        val password = authentication.credentials as String
 
         val candidate = User.repository.findByLogin(login) ?: throw BadCredentialsException("No such user: $login")
         if (!passwordEncoder().matches(password, candidate.password)) {

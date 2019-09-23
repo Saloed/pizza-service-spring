@@ -11,6 +11,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import kspt.pizzaservicespring.models.User
+import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -29,6 +30,7 @@ data class UserTokenParams(val id: Int, val login: String, val role: String)
 
 data class UserCredentials(val username: String, val password: String)
 
+data class Token(val token: String)
 
 class JwtAuthenticationFilter(
         private val myAuthenticationManager: AuthenticationManager
@@ -50,7 +52,7 @@ class JwtAuthenticationFilter(
 
     private fun JwtBuilder.addTokenParams(params: UserTokenParams) = claim("id", params.id)
             .claim("login", params.login)
-            .claim("role", params)
+            .claim("role", params.role)
 
 
     override fun successfulAuthentication(
@@ -71,7 +73,7 @@ class JwtAuthenticationFilter(
                 .setExpiration(getExpiration())
                 .addTokenParams(tokenParams)
                 .compact()
-        response.addHeader(SecurityConstants.TOKEN_HEADER, SecurityConstants.TOKEN_PREFIX + token)
+        jacksonObjectMapper().writeValue(response.outputStream, Token(token))
     }
 
     private fun getExpiration() = Date(System.currentTimeMillis() + validityInMs)

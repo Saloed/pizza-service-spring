@@ -1,4 +1,4 @@
-package ru.spbstu.architectures.pizzaService.utils
+package kspt.pizzaservicespring.utils
 
 object UserValidator {
 
