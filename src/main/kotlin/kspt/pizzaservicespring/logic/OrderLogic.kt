@@ -64,7 +64,7 @@ private val transitions = listOf(
                 }
 
                 val promo = PromoClient.repository
-                        .findByClientAndPromo_StatusIn(user as Client, listOf(PromoStatus.ACTIVE))
+                        .findAllByClientAndPromo_StatusIn(user as Client, listOf(PromoStatus.ACTIVE))
                         .map { it.promo }
                         .find { it.id == modification.promoId }
                         ?: return fail("No promo available")
@@ -242,10 +242,10 @@ object OrderLogic {
     }
 
     suspend fun list(user: User) = when (user) {
-        is Client -> Order.repository.findByClient(user)
-        is Manager -> Order.repository.findByStatusInAndManager(OrderStatus.forManager, user)
-        is Operator -> Order.repository.findByStatusInAndOperator(OrderStatus.forOperator, user)
-        is Courier -> Order.repository.findByStatusInAndCourier(OrderStatus.forCourier, user)
+        is Client -> Order.repository.findAllByClient(user)
+        is Manager -> Order.repository.findAllByStatusInAndManager(OrderStatus.forManager, user)
+        is Operator -> Order.repository.findAllByStatusInAndOperator(OrderStatus.forOperator, user)
+        is Courier -> Order.repository.findAllByStatusInAndCourier(OrderStatus.forCourier, user)
     }.map { sanitizeOrder(user, it) }
 
     suspend fun get(user: User, id: Int): OrderWithPermission? {

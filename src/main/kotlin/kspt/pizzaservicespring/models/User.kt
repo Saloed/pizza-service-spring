@@ -1,6 +1,8 @@
 package kspt.pizzaservicespring.models
 
 import kspt.pizzaservicespring.repository.*
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
 import javax.persistence.*
 
 enum class UserRoleType {
@@ -16,8 +18,24 @@ sealed class User(
         val id: Int = -1,
         open val login: String,
         open val password: String
-) {
+): Authentication {
     abstract val role: UserRoleType
+
+    @Transient
+    private var isAuthenticated = false
+
+    override fun getName() = login
+    override fun getAuthorities() = listOf(GrantedAuthority {role.name})
+
+    override fun isAuthenticated() = isAuthenticated
+    override fun setAuthenticated(isAuthenticated: Boolean) {
+        this.isAuthenticated = isAuthenticated
+    }
+
+    override fun getCredentials() = this
+    override fun getPrincipal() = this
+    override fun getDetails() = this
+
 
     companion object {
         val repository: UserRepository by RepositoryRegister

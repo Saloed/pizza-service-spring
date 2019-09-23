@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional
 interface UserBaseRepository<T : User> : JpaRepository<T, Int>
 
 @Transactional
-interface UserRepository : UserBaseRepository<User>
+interface UserRepository : UserBaseRepository<User> {
+    fun findByLogin(login: String): User?
+}
 
 @Transactional
 interface ClientRepository : UserBaseRepository<Client>

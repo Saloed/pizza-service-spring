@@ -38,20 +38,20 @@ object PromoLogic {
 
     suspend fun list(user: User) = when (user) {
         is Manager -> {
-            val userPromos = Promo.repository.findByManager(user)
-            val activePromos = Promo.repository.findByStatusIn(listOf(PromoStatus.ACTIVE))
+            val userPromos = Promo.repository.findAllByManager(user)
+            val activePromos = Promo.repository.findAllByStatusIn(listOf(PromoStatus.ACTIVE))
             val managerPromoIds = userPromos.map { it.id }.toSet()
             val full = userPromos.map { it.fullPermission() }
             val infoOnly = activePromos.filterNot { it.id in managerPromoIds }.map { it.infoOnlyPermission() }
             MyResult.Success(full + infoOnly)
         }
         is Operator, is Courier -> {
-            val result = Promo.repository.findByStatusIn(listOf(PromoStatus.ACTIVE)).map { it.infoOnlyPermission() }
+            val result = Promo.repository.findAllByStatusIn(listOf(PromoStatus.ACTIVE)).map { it.infoOnlyPermission() }
             MyResult.Success(result)
         }
         is Client -> {
             val result = Promo.repository
-                    .findByStatusInAndClients_Client(listOf(PromoStatus.ACTIVE), user)
+                    .findAllByStatusInAndClients_Client(listOf(PromoStatus.ACTIVE), user)
                     .map { it.infoOnlyPermission() }
             MyResult.Success(result)
         }
@@ -62,7 +62,7 @@ object PromoLogic {
         if (user is Manager && user.id == promo.manager.id) return MyResult.Success(promo.fullPermission())
         if (user is Client) {
             val clientPromoIds = Promo.repository
-                    .findByStatusInAndClients_Client(listOf(PromoStatus.ACTIVE), user)
+                    .findAllByStatusInAndClients_Client(listOf(PromoStatus.ACTIVE), user)
                     .map { it.id }
             if (promo.id !in clientPromoIds) return MyResult.Error("No access")
         }

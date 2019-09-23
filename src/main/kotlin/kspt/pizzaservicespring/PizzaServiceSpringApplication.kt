@@ -1,7 +1,5 @@
 package kspt.pizzaservicespring
 
-import kspt.pizzaservicespring.models.Client
-import kspt.pizzaservicespring.models.User
 import kspt.pizzaservicespring.repository.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -29,9 +27,6 @@ class PizzaServiceSpringApplication(
                 PromoRepository::class to promoRepository,
                 PromoClientRepository::class to promoClientRepository
         )
-        println("users")
-        Client.repository.save(Client("name", "[password]", "address", "phone"))
-        User.repository.findAll().map { println("$it") }
     }
 
 }

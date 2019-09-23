@@ -15,7 +15,7 @@ object PromoClientLogic {
                 promo.clients.map { it.fullPermission() }
             }
             user is Manager && promoId == null -> {
-                val promos = Promo.repository.findByManager(user)
+                val promos = Promo.repository.findAllByManager(user)
                 promos.flatMap { promo ->
                     promo.clients.map { it.fullPermission() }
                 }
@@ -27,7 +27,7 @@ object PromoClientLogic {
             }
             user is Operator && promoId == null -> {
                 PromoClient.repository
-                        .findByOperatorAndPromo_StatusIn(user, listOf(PromoStatus.ACTIVE))
+                        .findAllByOperatorAndPromo_StatusIn(user, listOf(PromoStatus.ACTIVE))
                         .map { it.fullPermission() }
             }
 
