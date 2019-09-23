@@ -4,6 +4,8 @@ package kspt.pizzaservicespring.security
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.jsonwebtoken.JwtBuilder
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -37,7 +39,7 @@ class JwtAuthenticationFilter(
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val userCredentials = try{
-            ObjectMapper().readValue(request.inputStream, UserCredentials::class.java)
+            jacksonObjectMapper().readValue<UserCredentials>(request.inputStream)
         } catch (ex: JsonProcessingException){
             logger.warn("No credentials passed")
             throw BadCredentialsException("Np credentials supplied")
