@@ -1,33 +1,42 @@
 package kspt.pizzaservicespring.models
 
+import kspt.pizzaservicespring.repository.OrderPizzaRepository
 import kspt.pizzaservicespring.repository.PizzaRepository
 import kspt.pizzaservicespring.repository.RepositoryRegister
-import kspt.pizzaservicespring.repository.UserRepository
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.ManyToMany
+import javax.persistence.*
 
-// todo: rewrite on external api
 
-@Entity
 data class PizzaTopping(
-        @Id
-        val id: Int = -1,
+        val id: Int,
         val name: String
 )
 
-@Entity
+
 data class Pizza(
-        @Id
-        val id: Int = -1,
+        val id: Int,
         val name: String,
         val price: Int,
         val imageUrl: String,
-
-        @ManyToMany
         val toppings: List<PizzaTopping>
 ){
     companion object {
         val repository: PizzaRepository by RepositoryRegister
+    }
+}
+
+@Entity
+data class OrderPizza(
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        val id: Int = -1,
+
+        @ManyToOne(cascade = [CascadeType.ALL])
+        @JoinColumn(name = "order_id", referencedColumnName = "id")
+        val order: Order,
+
+        val pizzaId: Int
+) {
+    companion object {
+        val repository: OrderPizzaRepository by RepositoryRegister
     }
 }

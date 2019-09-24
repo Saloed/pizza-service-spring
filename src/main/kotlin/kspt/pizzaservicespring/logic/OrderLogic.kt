@@ -57,7 +57,7 @@ private val transitions = listOf(
 
             override fun apply(user: User, order: Order, modification: OrderModification): MyResult<Order> {
                 if (modification.promoId == null && order.promo == null) return success(order)
-                val fullCost = order.pizza.map { it.price }.sum()
+                val fullCost = order.fetchPizza().map { it.price }.sum()
                 if (modification.promoId == null) {
                     val newOrder = order.copy(promo = null, cost = fullCost)
                     return success(newOrder)
@@ -261,7 +261,7 @@ object OrderLogic {
     fun create(user: User, pizza: List<Int>): MyResult<OrderWithPermission> {
         if (user !is Client) return MyResult.Error("Only client can create orders")
         if (pizza.isEmpty()) return MyResult.Error("Order pizza is empty")
-        val dbPizza = Pizza.repository.findAllById(pizza)
+        val dbPizza = Pizza.repository.qetPizzaFromApi(pizza)
         if (!dbPizza.map { it.id }.containsAll(pizza)) return MyResult.Error("Pizza list contains unknown items")
         val pizzaCost = dbPizza.map { it.price }.sum()
         val order = Order(
@@ -270,8 +270,10 @@ object OrderLogic {
                 isActive = false,
                 client = user
         )
-        order.pizza.addAll(dbPizza)
+
         val createdOrder = Order.repository.save(order)
+        val orderPizza = dbPizza.map { OrderPizza(order = createdOrder, pizzaId = it.id) }
+        OrderPizza.repository.saveAll(orderPizza)
         val result = get(user, createdOrder.id) ?: return MyResult.Error("Not found")
         return MyResult.Success(result)
     }

@@ -62,13 +62,8 @@ data class Order(
         @JoinColumn(name = "promo_id", referencedColumnName = "id")
         val promo: Promo? = null,
 
-        @ManyToMany(cascade = [CascadeType.ALL])
-        @JoinTable(
-                name = "order_pizza",
-                joinColumns = [JoinColumn(name = "pizza_id")],
-                inverseJoinColumns = [JoinColumn(name = "order_id")]
-        )
-        val pizza: MutableList<Pizza> = arrayListOf(),
+        @OneToMany(mappedBy = "order")
+        val pizza: MutableList<OrderPizza> = arrayListOf(),
 
         @CreatedDate
         @Temporal(TemporalType.TIMESTAMP)
@@ -78,6 +73,9 @@ data class Order(
         @Temporal(TemporalType.TIMESTAMP)
         val updatedAt: Date = Date()
 ) {
+
+    fun fetchPizza() = Pizza.repository.qetPizzaFromApi(pizza.map { it.pizzaId })
+
     companion object {
         val repository: OrderRepository by RepositoryRegister
     }

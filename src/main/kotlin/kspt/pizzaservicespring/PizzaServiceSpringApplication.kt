@@ -1,5 +1,6 @@
 package kspt.pizzaservicespring
 
+import kspt.pizzaservicespring.external.ApiCacheRepository
 import kspt.pizzaservicespring.repository.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,9 +12,10 @@ class PizzaServiceSpringApplication(
         val clientRepository: ClientRepository,
         val orderRepository: OrderRepository,
         val paymentRepository: PaymentRepository,
-        val pizzaRepository: PizzaRepository,
+        val pizzaRepository: OrderPizzaRepository,
         val promoRepository: PromoRepository,
-        val promoClientRepository: PromoClientRepository
+        val promoClientRepository: PromoClientRepository,
+        val apiCacheRepository: ApiCacheRepository
 ) : CommandLineRunner {
 
 
@@ -23,9 +25,11 @@ class PizzaServiceSpringApplication(
                 ClientRepository::class to clientRepository,
                 OrderRepository::class to orderRepository,
                 PaymentRepository::class to paymentRepository,
-                PizzaRepository::class to pizzaRepository,
+                OrderPizzaRepository::class to pizzaRepository,
                 PromoRepository::class to promoRepository,
-                PromoClientRepository::class to promoClientRepository
+                PromoClientRepository::class to promoClientRepository,
+                ApiCacheRepository::class to apiCacheRepository,
+                PizzaRepository::class to PizzaRepository
         )
     }
 
