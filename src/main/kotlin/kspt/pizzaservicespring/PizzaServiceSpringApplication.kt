@@ -5,6 +5,10 @@ import kspt.pizzaservicespring.repository.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
+import org.springframework.web.filter.CommonsRequestLoggingFilter
+
+
 
 @SpringBootApplication
 class PizzaServiceSpringApplication(
@@ -18,6 +22,15 @@ class PizzaServiceSpringApplication(
         val apiCacheRepository: ApiCacheRepository
 ) : CommandLineRunner {
 
+    @Bean
+    fun requestLoggingFilter(): CommonsRequestLoggingFilter {
+        val loggingFilter = CommonsRequestLoggingFilter()
+        loggingFilter.setIncludeClientInfo(true)
+        loggingFilter.setIncludeQueryString(true)
+        loggingFilter.setIncludePayload(true)
+        loggingFilter.setIncludeHeaders(false)
+        return loggingFilter
+    }
 
     override fun run(vararg args: String?) {
         RepositoryRegister.init(
