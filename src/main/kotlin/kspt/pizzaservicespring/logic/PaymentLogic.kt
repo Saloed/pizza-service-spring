@@ -7,7 +7,7 @@ import org.springframework.data.repository.findByIdOrNull
 data class PaymentCreateForm(val orderId: Int, val type: String, val amount: Int, val transaction: String?)
 
 object PaymentLogic {
-    suspend fun create(user: User, payment: PaymentCreateForm): MyResult<PaymentWithPermission> {
+    fun create(user: User, payment: PaymentCreateForm): MyResult<PaymentWithPermission> {
         if (user !is Courier) return MyResult.Error("Only courier can create payments")
         val order = Order.repository.findByIdOrNull(payment.orderId)
         if (order == null || order.courier?.id != user.id) return MyResult.Error("Order not found")

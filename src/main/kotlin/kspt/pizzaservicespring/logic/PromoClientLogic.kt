@@ -7,7 +7,7 @@ import org.springframework.data.repository.findByIdOrNull
 
 object PromoClientLogic {
 
-    suspend fun list(user: User, promoId: Int?): MyResult<List<PromoClientWithPermission>> {
+    fun list(user: User, promoId: Int?): MyResult<List<PromoClientWithPermission>> {
         return when {
             user is Manager && promoId != null -> {
                 val promo = Promo.repository.findByIdOrNull(promoId) ?: return MyResult.Error("No such promo")
@@ -35,7 +35,7 @@ object PromoClientLogic {
         }.let { MyResult.Success(it) }
     }
 
-    suspend fun get(user: User, id: Int): MyResult<PromoClientWithPermission> {
+    fun get(user: User, id: Int): MyResult<PromoClientWithPermission> {
         if (user !is Manager && user !is Operator) return MyResult.Error("No access")
         val promoClient = PromoClient.repository.findByIdOrNull(id) ?: return MyResult.Error("Not found")
         if (user is Manager && promoClient.promo.manager.id != user.id) return MyResult.Error("No access")
@@ -43,7 +43,7 @@ object PromoClientLogic {
         return MyResult.Success(promoClient.fullPermission())
     }
 
-    suspend fun update(user: User, id: Int, status: PromoClientStatus): MyResult<PromoClientWithPermission> {
+    fun update(user: User, id: Int, status: PromoClientStatus): MyResult<PromoClientWithPermission> {
         if (user !is Operator) return MyResult.Error("Only operator can change promo client status")
         val promoClient = PromoClient.repository.findByIdOrNull(id) ?: return MyResult.Error("Not found")
         if (promoClient.operator?.id != user.id) return MyResult.Error("No access")

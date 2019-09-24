@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody
 @Controller
 class ClientRegistrationController {
     @PostMapping(SecurityConstants.CLIENT_REGISTRATION_URL)
-    fun register(@RequestBody form: ClientRegistrationForm): ResponseEntity<RegistrationErrorResponse> {
-        return form.createGenericUser { login, password ->
-            UserLogic.createClient(login, password)
-        }
-    }
+    fun register(@RequestBody form: ClientRegistrationForm) =
+            form.createGenericUser { login, password ->
+                UserLogic.createClient(login, password)
+            }
 }

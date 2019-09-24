@@ -19,7 +19,7 @@ private abstract class OrderTransition<T : User>(val from: List<OrderStatus>, va
 
     abstract fun checkUserAccess(user: User, order: Order): Boolean
     open fun additionalChecks(user: User, order: Order, modification: OrderModification) = true
-    abstract suspend fun apply(
+    abstract fun apply(
             user: User,
             order: Order,
             modification: OrderModification
@@ -55,7 +55,7 @@ private abstract class CourierOrderTransition(vararg from: OrderStatus, to: Orde
 private val transitions = listOf(
         object : ClientOrderTransition(OrderStatus.DRAFT, to = OrderStatus.DRAFT) {
 
-            override suspend fun apply(user: User, order: Order, modification: OrderModification): MyResult<Order> {
+            override fun apply(user: User, order: Order, modification: OrderModification): MyResult<Order> {
                 if (modification.promoId == null && order.promo == null) return success(order)
                 val fullCost = order.pizza.map { it.price }.sum()
                 if (modification.promoId == null) {
@@ -80,17 +80,17 @@ private val transitions = listOf(
 
         },
         object : ClientOrderTransition(OrderStatus.DRAFT, to = OrderStatus.NEW) {
-            suspend fun findOperator(): Operator {
+            fun findOperator(): Operator {
                 val operators = Operator.repository.findAll()
                 return operators.random()
             }
 
-            suspend fun findManager(): Manager {
+            fun findManager(): Manager {
                 val managers = Manager.repository.findAll()
                 return managers.random()
             }
 
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -109,7 +109,7 @@ private val transitions = listOf(
                 OrderStatus.SHIPPING,
                 to = OrderStatus.CANCELED
         ) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -118,7 +118,7 @@ private val transitions = listOf(
             }
         },
         object : OperatorOrderTransition(OrderStatus.NEW, to = OrderStatus.APPROVED) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -127,7 +127,7 @@ private val transitions = listOf(
             }
         },
         object : OperatorOrderTransition(OrderStatus.NEW, to = OrderStatus.CANCELED) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -136,7 +136,7 @@ private val transitions = listOf(
             }
         },
         object : ManagerOrderTransition(OrderStatus.APPROVED, to = OrderStatus.PROCESSING) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -145,12 +145,12 @@ private val transitions = listOf(
             }
         },
         object : ManagerOrderTransition(OrderStatus.PROCESSING, to = OrderStatus.READY) {
-            suspend fun findCourier(): Courier {
+            fun findCourier(): Courier {
                 val couriers = Courier.repository.findAll()
                 return couriers.random()
             }
 
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -161,7 +161,7 @@ private val transitions = listOf(
 
         },
         object : ManagerOrderTransition(OrderStatus.APPROVED, OrderStatus.PROCESSING, to = OrderStatus.CANCELED) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -170,7 +170,7 @@ private val transitions = listOf(
             }
         },
         object : CourierOrderTransition(OrderStatus.READY, to = OrderStatus.SHIPPING) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -179,7 +179,7 @@ private val transitions = listOf(
             }
         },
         object : CourierOrderTransition(OrderStatus.SHIPPING, to = OrderStatus.CLOSED) {
-            override suspend fun apply(
+            override fun apply(
                     user: User,
                     order: Order,
                     modification: OrderModification
@@ -241,14 +241,14 @@ object OrderLogic {
         }
     }
 
-    suspend fun list(user: User) = when (user) {
+    fun list(user: User) = when (user) {
         is Client -> Order.repository.findAllByClient(user)
         is Manager -> Order.repository.findAllByStatusInAndManager(OrderStatus.forManager, user)
         is Operator -> Order.repository.findAllByStatusInAndOperator(OrderStatus.forOperator, user)
         is Courier -> Order.repository.findAllByStatusInAndCourier(OrderStatus.forCourier, user)
     }.map { sanitizeOrder(user, it) }
 
-    suspend fun get(user: User, id: Int): OrderWithPermission? {
+    fun get(user: User, id: Int): OrderWithPermission? {
         val order = Order.repository.findByIdOrNull(id) ?: return null
         return when (user) {
             is Client -> if (order.client.id == user.id) order else null
@@ -258,7 +258,7 @@ object OrderLogic {
         }?.let { sanitizeOrder(user, it) }
     }
 
-    suspend fun create(user: User, pizza: List<Int>): MyResult<OrderWithPermission> {
+    fun create(user: User, pizza: List<Int>): MyResult<OrderWithPermission> {
         if (user !is Client) return MyResult.Error("Only client can create orders")
         if (pizza.isEmpty()) return MyResult.Error("Order pizza is empty")
         val dbPizza = Pizza.repository.findAllById(pizza)
@@ -277,7 +277,7 @@ object OrderLogic {
     }
 
 
-    suspend fun change(
+    fun change(
             user: User,
             orderId: Int,
             modification: OrderModification

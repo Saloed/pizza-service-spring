@@ -44,7 +44,7 @@ data class PromoClientWithPermission(
         val status: String?
 )
 
-suspend fun PromoClient.fullPermission() = PromoClientWithPermission(
+fun PromoClient.fullPermission() = PromoClientWithPermission(
         id, promo.id, client.fullPermission(), operator?.fullPermission(), status.name
 )
 
@@ -57,7 +57,7 @@ data class PromoWithPermission(
         val result: String?
 )
 
-suspend fun Promo.fullPermission() = PromoWithPermission(
+fun Promo.fullPermission() = PromoWithPermission(
         id, effect.name, description, status.name, manager.infoOnlyPermission(), result
 )
 

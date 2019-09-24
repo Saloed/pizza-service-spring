@@ -10,7 +10,7 @@ data class PromoCreationParameters(val clientIds: List<Int>, val effect: PromoEf
 data class PromoModificationParams(val status: PromoStatus, val result: String?)
 
 object PromoLogic {
-    suspend fun create(user: User, parameters: PromoCreationParameters): MyResult<PromoWithPermission> {
+    fun create(user: User, parameters: PromoCreationParameters): MyResult<PromoWithPermission> {
         if (user !is Manager) return MyResult.Error("Only manager can create promos")
         if (parameters.clientIds.isEmpty()) return MyResult.Error("Promo without users is not permitted")
         val clients = Client.repository.findAllById(parameters.clientIds)
@@ -36,7 +36,7 @@ object PromoLogic {
     }
 
 
-    suspend fun list(user: User) = when (user) {
+    fun list(user: User) = when (user) {
         is Manager -> {
             val userPromos = Promo.repository.findAllByManager(user)
             val activePromos = Promo.repository.findAllByStatusIn(listOf(PromoStatus.ACTIVE))
@@ -57,7 +57,7 @@ object PromoLogic {
         }
     }
 
-    suspend fun get(user: User, promoId: Int): MyResult<PromoWithPermission> {
+    fun get(user: User, promoId: Int): MyResult<PromoWithPermission> {
         val promo = Promo.repository.findByIdOrNull(promoId) ?: return MyResult.Error("Not found")
         if (user is Manager && user.id == promo.manager.id) return MyResult.Success(promo.fullPermission())
         if (user is Client) {
@@ -69,7 +69,7 @@ object PromoLogic {
         return MyResult.Success(promo.infoOnlyPermission())
     }
 
-    private suspend fun startPromo(user: User, promo: Promo): Promo {
+    private fun startPromo(user: User, promo: Promo): Promo {
         val operators = Operator.repository.findAll()
         val clientsWithOperator = promo.clients.map {
             it.copy(
@@ -81,16 +81,16 @@ object PromoLogic {
         return promo.copy(status = PromoStatus.ACTIVE)
     }
 
-    private suspend fun closePromo(user: User, promo: Promo): Promo {
+    private fun closePromo(user: User, promo: Promo): Promo {
         return promo.copy(status = PromoStatus.FINISHED)
     }
 
-    private suspend fun analyzePromo(user: User, promo: Promo, result: String): Promo {
+    private fun analyzePromo(user: User, promo: Promo, result: String): Promo {
         return promo.copy(status = PromoStatus.CLOSED, result = result)
     }
 
 
-    suspend fun update(user: User, promoId: Int, params: PromoModificationParams): MyResult<PromoWithPermission> {
+    fun update(user: User, promoId: Int, params: PromoModificationParams): MyResult<PromoWithPermission> {
         if (user !is Manager) return MyResult.Error("Only manager can modify promos")
         val promo = Promo.repository.findByIdOrNull(promoId) ?: return MyResult.Error("Not found")
         if (promo.manager.id != user.id) return MyResult.Error("No access")
