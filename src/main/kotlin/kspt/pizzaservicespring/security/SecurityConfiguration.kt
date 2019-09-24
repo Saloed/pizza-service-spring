@@ -2,6 +2,7 @@ package kspt.pizzaservicespring.security
 
 import kspt.pizzaservicespring.models.User
 import org.springframework.context.annotation.Bean
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -56,7 +57,10 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", CorsConfiguration().applyPermitDefaultValues())
+        val corsConfiguration = CorsConfiguration().applyPermitDefaultValues()
+        corsConfiguration.addAllowedMethod(HttpMethod.OPTIONS)
+        corsConfiguration.addAllowedMethod(HttpMethod.PUT)
+        source.registerCorsConfiguration("/**", corsConfiguration)
         return source
     }
 }

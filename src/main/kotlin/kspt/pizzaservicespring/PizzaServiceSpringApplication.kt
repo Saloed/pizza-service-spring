@@ -13,6 +13,9 @@ import org.springframework.web.filter.CommonsRequestLoggingFilter
 class PizzaServiceSpringApplication(
         val userRepository: UserRepository,
         val clientRepository: ClientRepository,
+        val operatorRepository: OperatorRepository,
+        val managerRepository: ManagerRepository,
+        val courierRepository: CourierRepository,
         val orderRepository: OrderRepository,
         val paymentRepository: PaymentRepository,
         val pizzaRepository: OrderPizzaRepository,
@@ -35,6 +38,9 @@ class PizzaServiceSpringApplication(
         RepositoryRegister.init(
                 UserRepository::class to userRepository,
                 ClientRepository::class to clientRepository,
+                ManagerRepository::class to managerRepository,
+                OperatorRepository::class to operatorRepository,
+                CourierRepository::class to courierRepository,
                 OrderRepository::class to orderRepository,
                 PaymentRepository::class to paymentRepository,
                 OrderPizzaRepository::class to pizzaRepository,
