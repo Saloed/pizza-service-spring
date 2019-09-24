@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.web.filter.CommonsRequestLoggingFilter
 
 
-
 @SpringBootApplication
 class PizzaServiceSpringApplication(
         val userRepository: UserRepository,
@@ -44,6 +43,8 @@ class PizzaServiceSpringApplication(
                 ApiCacheRepository::class to apiCacheRepository,
                 PizzaRepository::class to PizzaRepository
         )
+        DummyInitializer.init()
+
     }
 
 }
